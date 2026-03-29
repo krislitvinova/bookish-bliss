@@ -110,14 +110,27 @@ export default function Index() {
               </Button>
             ))}
           </div>
-          <div className="relative w-full sm:w-48">
-            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
-            <Input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search..."
-              className="pl-8 h-8 text-xs"
-            />
+          <div className="flex items-center gap-2">
+            <div className="relative w-full sm:w-48">
+              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+              <Input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search..."
+                className="pl-8 h-8 text-xs"
+              />
+            </div>
+            <Select value={sort} onValueChange={(v) => setSort(v as SortOption)}>
+              <SelectTrigger className="h-8 w-[130px] text-xs">
+                <ArrowUpDown className="h-3 w-3 mr-1 text-muted-foreground" />
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="date">Date added</SelectItem>
+                <SelectItem value="title">Title</SelectItem>
+                <SelectItem value="rating">Rating</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
 
