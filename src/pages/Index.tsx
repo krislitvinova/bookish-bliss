@@ -1,7 +1,14 @@
 import { useState, useCallback } from "react";
-import { Plus, Library, Search } from "lucide-react";
+import { Plus, Library, Search, ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { StatsBar } from "@/components/StatsBar";
 import { BookCard } from "@/components/BookCard";
 import { AddBookDialog } from "@/components/AddBookDialog";
@@ -16,6 +23,7 @@ import {
 } from "@/lib/books";
 
 type FilterStatus = BookStatus | "all";
+type SortOption = "date" | "title" | "rating";
 
 export default function Index() {
   const [books, setBooks] = useState<Book[]>(getBooks);
@@ -24,6 +32,7 @@ export default function Index() {
   const [detailOpen, setDetailOpen] = useState(false);
   const [filter, setFilter] = useState<FilterStatus>("all");
   const [search, setSearch] = useState("");
+  const [sort, setSort] = useState<SortOption>("date");
 
   const refresh = useCallback(() => setBooks(getBooks()), []);
 
@@ -47,14 +56,20 @@ export default function Index() {
     setDetailOpen(true);
   };
 
-  const filtered = books.filter((b) => {
-    if (filter !== "all" && b.status !== filter) return false;
-    if (search) {
-      const q = search.toLowerCase();
-      return b.title.toLowerCase().includes(q) || b.author.toLowerCase().includes(q);
-    }
-    return true;
-  });
+  const filtered = books
+    .filter((b) => {
+      if (filter !== "all" && b.status !== filter) return false;
+      if (search) {
+        const q = search.toLowerCase();
+        return b.title.toLowerCase().includes(q) || b.author.toLowerCase().includes(q);
+      }
+      return true;
+    })
+    .sort((a, b) => {
+      if (sort === "title") return a.title.localeCompare(b.title);
+      if (sort === "rating") return b.rating - a.rating;
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
 
   const filters: { label: string; value: FilterStatus }[] = [
     { label: "All", value: "all" },
@@ -95,14 +110,27 @@ export default function Index() {
               </Button>
             ))}
           </div>
-          <div className="relative w-full sm:w-48">
-            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
-            <Input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search..."
-              className="pl-8 h-8 text-xs"
-            />
+          <div className="flex items-center gap-2">
+            <div className="relative w-full sm:w-48">
+              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+              <Input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search..."
+                className="pl-8 h-8 text-xs"
+              />
+            </div>
+            <Select value={sort} onValueChange={(v) => setSort(v as SortOption)}>
+              <SelectTrigger className="h-8 w-[130px] text-xs">
+                <ArrowUpDown className="h-3 w-3 mr-1 text-muted-foreground" />
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="date">Date added</SelectItem>
+                <SelectItem value="title">Title</SelectItem>
+                <SelectItem value="rating">Rating</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
 
