@@ -23,6 +23,7 @@ import {
 } from "@/lib/books";
 
 type FilterStatus = BookStatus | "all";
+type SortOption = "date" | "title" | "rating";
 
 export default function Index() {
   const [books, setBooks] = useState<Book[]>(getBooks);
