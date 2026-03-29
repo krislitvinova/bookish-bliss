@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { Plus, Library, Search } from "lucide-react";
+import { Plus, Library, Search, ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { StatsBar } from "@/components/StatsBar";
