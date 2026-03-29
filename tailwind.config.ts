@@ -13,7 +13,15 @@ export default {
       },
     },
     extend: {
+      fontFamily: {
+        sans: ["Inter", "system-ui", "-apple-system", "sans-serif"],
+      },
       colors: {
+        status: {
+          reading: "hsl(var(--status-reading))",
+          finished: "hsl(var(--status-finished))",
+          "to-read": "hsl(var(--status-to-read))",
+        },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
