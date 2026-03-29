@@ -23,7 +23,7 @@ import { BookStatus, STATUS_LABELS } from "@/lib/books";
 interface AddBookDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onAdd: (book: { title: string; author: string; status: BookStatus; rating: number; notes: string }) => void;
+  onAdd: (book: { title: string; author: string; status: BookStatus; rating: number; notes: string; currentPage?: number; totalPages?: number }) => void;
 }
 
 export function AddBookDialog({ open, onOpenChange, onAdd }: AddBookDialogProps) {
