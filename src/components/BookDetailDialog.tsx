@@ -35,6 +35,8 @@ export function BookDetailDialog({ book, open, onOpenChange, onUpdate, onDelete 
   const [status, setStatus] = useState<BookStatus>("to-read");
   const [rating, setRating] = useState(0);
   const [notes, setNotes] = useState("");
+  const [currentPage, setCurrentPage] = useState("");
+  const [totalPages, setTotalPages] = useState("");
 
   useEffect(() => {
     if (book) {
@@ -43,13 +45,19 @@ export function BookDetailDialog({ book, open, onOpenChange, onUpdate, onDelete 
       setStatus(book.status);
       setRating(book.rating);
       setNotes(book.notes);
+      setCurrentPage(book.currentPage?.toString() || "");
+      setTotalPages(book.totalPages?.toString() || "");
     }
   }, [book]);
 
   if (!book) return null;
 
   const handleSave = () => {
-    onUpdate(book.id, { title, author, status, rating, notes });
+    onUpdate(book.id, {
+      title, author, status, rating, notes,
+      currentPage: currentPage ? parseInt(currentPage) : undefined,
+      totalPages: totalPages ? parseInt(totalPages) : undefined,
+    });
     onOpenChange(false);
   };
 
