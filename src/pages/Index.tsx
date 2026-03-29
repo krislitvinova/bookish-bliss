@@ -32,6 +32,7 @@ export default function Index() {
   const [detailOpen, setDetailOpen] = useState(false);
   const [filter, setFilter] = useState<FilterStatus>("all");
   const [search, setSearch] = useState("");
+  const [sort, setSort] = useState<SortOption>("date");
 
   const refresh = useCallback(() => setBooks(getBooks()), []);
 
