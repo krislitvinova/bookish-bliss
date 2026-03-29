@@ -56,14 +56,20 @@ export default function Index() {
     setDetailOpen(true);
   };
 
-  const filtered = books.filter((b) => {
-    if (filter !== "all" && b.status !== filter) return false;
-    if (search) {
-      const q = search.toLowerCase();
-      return b.title.toLowerCase().includes(q) || b.author.toLowerCase().includes(q);
-    }
-    return true;
-  });
+  const filtered = books
+    .filter((b) => {
+      if (filter !== "all" && b.status !== filter) return false;
+      if (search) {
+        const q = search.toLowerCase();
+        return b.title.toLowerCase().includes(q) || b.author.toLowerCase().includes(q);
+      }
+      return true;
+    })
+    .sort((a, b) => {
+      if (sort === "title") return a.title.localeCompare(b.title);
+      if (sort === "rating") return b.rating - a.rating;
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
 
   const filters: { label: string; value: FilterStatus }[] = [
     { label: "All", value: "all" },
