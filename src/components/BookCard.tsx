@@ -1,6 +1,7 @@
 import { Book, STATUS_LABELS } from "@/lib/books";
 import { Badge } from "@/components/ui/badge";
 import { StarRating } from "./StarRating";
+import { Progress } from "@/components/ui/progress";
 
 interface BookCardProps {
   book: Book;
