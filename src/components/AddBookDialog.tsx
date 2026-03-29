@@ -23,7 +23,7 @@ import { BookStatus, STATUS_LABELS } from "@/lib/books";
 interface AddBookDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onAdd: (book: { title: string; author: string; status: BookStatus; rating: number; notes: string }) => void;
+  onAdd: (book: { title: string; author: string; status: BookStatus; rating: number; notes: string; currentPage?: number; totalPages?: number }) => void;
 }
 
 export function AddBookDialog({ open, onOpenChange, onAdd }: AddBookDialogProps) {
@@ -32,16 +32,28 @@ export function AddBookDialog({ open, onOpenChange, onAdd }: AddBookDialogProps)
   const [status, setStatus] = useState<BookStatus>("to-read");
   const [rating, setRating] = useState(0);
   const [notes, setNotes] = useState("");
+  const [currentPage, setCurrentPage] = useState("");
+  const [totalPages, setTotalPages] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim() || !author.trim()) return;
-    onAdd({ title: title.trim(), author: author.trim(), status, rating, notes: notes.trim() });
+    onAdd({
+      title: title.trim(),
+      author: author.trim(),
+      status,
+      rating,
+      notes: notes.trim(),
+      currentPage: currentPage ? parseInt(currentPage) : undefined,
+      totalPages: totalPages ? parseInt(totalPages) : undefined,
+    });
     setTitle("");
     setAuthor("");
     setStatus("to-read");
     setRating(0);
     setNotes("");
+    setCurrentPage("");
+    setTotalPages("");
     onOpenChange(false);
   };
 
@@ -74,6 +86,16 @@ export function AddBookDialog({ open, onOpenChange, onAdd }: AddBookDialogProps)
               </SelectContent>
             </Select>
           </div>
+          {status === "reading" && (
+            <div className="space-y-2">
+              <Label>Reading progress</Label>
+              <div className="flex items-center gap-2">
+                <Input type="number" min="0" value={currentPage} onChange={(e) => setCurrentPage(e.target.value)} placeholder="Current page" className="flex-1" />
+                <span className="text-muted-foreground text-sm">/</span>
+                <Input type="number" min="1" value={totalPages} onChange={(e) => setTotalPages(e.target.value)} placeholder="Total pages" className="flex-1" />
+              </div>
+            </div>
+          )}
           <div className="space-y-2">
             <Label>Rating</Label>
             <StarRating rating={rating} onChange={setRating} size="md" />

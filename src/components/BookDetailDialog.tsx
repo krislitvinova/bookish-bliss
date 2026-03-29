@@ -35,6 +35,8 @@ export function BookDetailDialog({ book, open, onOpenChange, onUpdate, onDelete 
   const [status, setStatus] = useState<BookStatus>("to-read");
   const [rating, setRating] = useState(0);
   const [notes, setNotes] = useState("");
+  const [currentPage, setCurrentPage] = useState("");
+  const [totalPages, setTotalPages] = useState("");
 
   useEffect(() => {
     if (book) {
@@ -43,13 +45,19 @@ export function BookDetailDialog({ book, open, onOpenChange, onUpdate, onDelete 
       setStatus(book.status);
       setRating(book.rating);
       setNotes(book.notes);
+      setCurrentPage(book.currentPage?.toString() || "");
+      setTotalPages(book.totalPages?.toString() || "");
     }
   }, [book]);
 
   if (!book) return null;
 
   const handleSave = () => {
-    onUpdate(book.id, { title, author, status, rating, notes });
+    onUpdate(book.id, {
+      title, author, status, rating, notes,
+      currentPage: currentPage ? parseInt(currentPage) : undefined,
+      totalPages: totalPages ? parseInt(totalPages) : undefined,
+    });
     onOpenChange(false);
   };
 
@@ -87,6 +95,16 @@ export function BookDetailDialog({ book, open, onOpenChange, onUpdate, onDelete 
               </SelectContent>
             </Select>
           </div>
+          {status === "reading" && (
+            <div className="space-y-2">
+              <Label>Reading progress</Label>
+              <div className="flex items-center gap-2">
+                <Input type="number" min="0" value={currentPage} onChange={(e) => setCurrentPage(e.target.value)} placeholder="Current page" className="flex-1" />
+                <span className="text-muted-foreground text-sm">/</span>
+                <Input type="number" min="1" value={totalPages} onChange={(e) => setTotalPages(e.target.value)} placeholder="Total pages" className="flex-1" />
+              </div>
+            </div>
+          )}
           <div className="space-y-2">
             <Label>Rating</Label>
             <StarRating rating={rating} onChange={setRating} size="md" />

@@ -9,6 +9,8 @@ export interface Book {
   notes: string;
   createdAt: string;
   finishedAt?: string;
+  currentPage?: number;
+  totalPages?: number;
 }
 
 const STORAGE_KEY = "book-tracker-library";
