@@ -32,6 +32,14 @@ export function BookCard({ book, onClick }: BookCardProps) {
           <StarRating rating={book.rating} />
         </div>
       )}
+      {book.status === "reading" && book.totalPages && book.totalPages > 0 && (
+        <div className="mt-3 flex items-center gap-2">
+          <Progress value={((book.currentPage || 0) / book.totalPages) * 100} className="h-1 flex-1" />
+          <span className="text-[10px] text-muted-foreground whitespace-nowrap">
+            {book.currentPage || 0}/{book.totalPages}
+          </span>
+        </div>
+      )}
       {book.notes && (
         <p className="mt-2 text-xs text-muted-foreground line-clamp-2 leading-relaxed">
           {book.notes}

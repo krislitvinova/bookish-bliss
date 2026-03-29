@@ -86,6 +86,16 @@ export function AddBookDialog({ open, onOpenChange, onAdd }: AddBookDialogProps)
               </SelectContent>
             </Select>
           </div>
+          {status === "reading" && (
+            <div className="space-y-2">
+              <Label>Reading progress</Label>
+              <div className="flex items-center gap-2">
+                <Input type="number" min="0" value={currentPage} onChange={(e) => setCurrentPage(e.target.value)} placeholder="Current page" className="flex-1" />
+                <span className="text-muted-foreground text-sm">/</span>
+                <Input type="number" min="1" value={totalPages} onChange={(e) => setTotalPages(e.target.value)} placeholder="Total pages" className="flex-1" />
+              </div>
+            </div>
+          )}
           <div className="space-y-2">
             <Label>Rating</Label>
             <StarRating rating={rating} onChange={setRating} size="md" />
