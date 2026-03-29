@@ -2,6 +2,13 @@ import { useState, useCallback } from "react";
 import { Plus, Library, Search, ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { StatsBar } from "@/components/StatsBar";
 import { BookCard } from "@/components/BookCard";
 import { AddBookDialog } from "@/components/AddBookDialog";
