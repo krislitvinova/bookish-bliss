@@ -32,16 +32,28 @@ export function AddBookDialog({ open, onOpenChange, onAdd }: AddBookDialogProps)
   const [status, setStatus] = useState<BookStatus>("to-read");
   const [rating, setRating] = useState(0);
   const [notes, setNotes] = useState("");
+  const [currentPage, setCurrentPage] = useState("");
+  const [totalPages, setTotalPages] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim() || !author.trim()) return;
-    onAdd({ title: title.trim(), author: author.trim(), status, rating, notes: notes.trim() });
+    onAdd({
+      title: title.trim(),
+      author: author.trim(),
+      status,
+      rating,
+      notes: notes.trim(),
+      currentPage: currentPage ? parseInt(currentPage) : undefined,
+      totalPages: totalPages ? parseInt(totalPages) : undefined,
+    });
     setTitle("");
     setAuthor("");
     setStatus("to-read");
     setRating(0);
     setNotes("");
+    setCurrentPage("");
+    setTotalPages("");
     onOpenChange(false);
   };
 
