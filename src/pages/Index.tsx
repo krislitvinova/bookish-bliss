@@ -37,7 +37,7 @@ export default function Index() {
 
   const refresh = useCallback(() => setBooks(getBooks()), []);
 
-  const handleAdd = (data: { title: string; author: string; status: BookStatus; rating: number; notes: string }) => {
+  const handleAdd = (data: { title: string; author: string; status: BookStatus; rating: number; notes: string; coverUrl?: string }) => {
     addBook(data);
     refresh();
   };

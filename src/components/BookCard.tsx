@@ -21,9 +21,17 @@ export function BookCard({ book, onClick }: BookCardProps) {
       onClick={() => onClick(book)}
       className="group w-full text-left rounded-xl bg-card overflow-hidden shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
     >
-      {/* Cover placeholder */}
-      <div className={`relative aspect-[2/3] w-full bg-gradient-to-br ${COVER_GRADIENTS[book.status] ?? COVER_GRADIENTS.reading} flex items-center justify-center`}>
-        <BookOpen className="h-10 w-10 text-muted-foreground/30" strokeWidth={1.5} />
+      {/* Cover */}
+      <div className={`relative aspect-[2/3] w-full ${book.coverUrl ? '' : `bg-gradient-to-br ${COVER_GRADIENTS[book.status] ?? COVER_GRADIENTS.reading}`} flex items-center justify-center overflow-hidden`}>
+        {book.coverUrl ? (
+          <img
+            src={book.coverUrl}
+            alt={`Cover of ${book.title}`}
+            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+          />
+        ) : (
+          <BookOpen className="h-10 w-10 text-muted-foreground/30" strokeWidth={1.5} />
+        )}
         <div className="absolute top-2.5 right-2.5">
           <Badge variant={book.status === "reading" ? "reading" : book.status === "finished" ? "finished" : "to-read"} className="text-[10px] px-2 py-0.5 shadow-sm">
             {STATUS_LABELS[book.status]}
