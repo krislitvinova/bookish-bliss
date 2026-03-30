@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { Plus, Library, Search, ArrowUpDown } from "lucide-react";
+import { Plus, Library, Search, ArrowUpDown, BookOpen, Armchair } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -80,75 +80,97 @@ export default function Index() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="mx-auto max-w-3xl px-4 py-8 sm:py-12">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-2.5">
-            <Library className="h-5 w-5 text-primary" />
-            <h1 className="text-xl font-semibold tracking-tight text-foreground">Library</h1>
-          </div>
-          <Button size="sm" onClick={() => setAddOpen(true)}>
-            <Plus className="h-4 w-4 mr-1" /> Add book
-          </Button>
-        </div>
-
-        {/* Stats */}
-        <StatsBar books={books} />
-
-        {/* Filters + Search */}
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mt-6 mb-5">
-          <div className="flex gap-1">
-            {filters.map((f) => (
-              <Button
-                key={f.value}
-                variant={filter === f.value ? "secondary" : "ghost"}
-                size="sm"
-                className="text-xs h-8"
-                onClick={() => setFilter(f.value)}
-              >
-                {f.label}
-              </Button>
-            ))}
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="relative w-full sm:w-48">
-              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
-              <Input
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search..."
-                className="pl-8 h-8 text-xs"
-              />
+      <div className="mx-auto max-w-5xl px-4 py-8 sm:py-12">
+        {/* Elevated container */}
+        <div className="bg-card rounded-2xl shadow-lg shadow-foreground/[0.04] border border-border/60 p-6 sm:p-10">
+          {/* Header */}
+          <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                <Library className="h-5 w-5 text-primary" />
+              </div>
+              <h1 className="font-serif text-2xl font-bold tracking-tight text-foreground">Library</h1>
             </div>
-            <Select value={sort} onValueChange={(v) => setSort(v as SortOption)}>
-              <SelectTrigger className="h-8 w-[130px] text-xs">
-                <ArrowUpDown className="h-3 w-3 mr-1 text-muted-foreground" />
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="date">Date added</SelectItem>
-                <SelectItem value="title">Title</SelectItem>
-                <SelectItem value="rating">Rating</SelectItem>
-              </SelectContent>
-            </Select>
+            <Button size="sm" className="rounded-lg shadow-sm" onClick={() => setAddOpen(true)}>
+              <Plus className="h-4 w-4 mr-1.5" /> Add book
+            </Button>
           </div>
-        </div>
 
-        {/* Book Grid */}
-        {filtered.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 text-center">
-            <Library className="h-10 w-10 text-border mb-3" />
-            <p className="text-sm text-muted-foreground">
-              {books.length === 0 ? "Your library is empty. Add your first book!" : "No books match your filters."}
-            </p>
+          {/* Stats */}
+          <StatsBar books={books} />
+
+          {/* Filters + Search */}
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mt-7 mb-6">
+            <div className="flex gap-1.5">
+              {filters.map((f) => (
+                <Button
+                  key={f.value}
+                  variant={filter === f.value ? "default" : "ghost"}
+                  size="sm"
+                  className={`text-xs h-8 rounded-full px-4 transition-all duration-200 ${
+                    filter === f.value
+                      ? "shadow-sm"
+                      : "hover:bg-secondary"
+                  }`}
+                  onClick={() => setFilter(f.value)}
+                >
+                  {f.label}
+                </Button>
+              ))}
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="relative w-full sm:w-48">
+                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+                <Input
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Search..."
+                  className="pl-8 h-8 text-xs rounded-lg"
+                />
+              </div>
+              <Select value={sort} onValueChange={(v) => setSort(v as SortOption)}>
+                <SelectTrigger className="h-8 w-[130px] text-xs rounded-lg">
+                  <ArrowUpDown className="h-3 w-3 mr-1 text-muted-foreground" />
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="date">Date added</SelectItem>
+                  <SelectItem value="title">Title</SelectItem>
+                  <SelectItem value="rating">Rating</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
-        ) : (
-          <div className="grid gap-3 sm:grid-cols-2">
-            {filtered.map((book) => (
-              <BookCard key={book.id} book={book} onClick={handleBookClick} />
-            ))}
-          </div>
-        )}
+
+          {/* Book Grid */}
+          {filtered.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-20 text-center">
+              <div className="relative mb-6">
+                <div className="h-24 w-24 rounded-2xl bg-secondary flex items-center justify-center">
+                  <Armchair className="h-12 w-12 text-muted-foreground/40" strokeWidth={1.2} />
+                </div>
+                <div className="absolute -top-2 -right-3 h-10 w-8 rounded-md bg-accent/15 border border-accent/20 rotate-12 flex items-center justify-center">
+                  <BookOpen className="h-4 w-4 text-accent/50" />
+                </div>
+                <div className="absolute -bottom-1 -left-3 h-8 w-6 rounded-sm bg-primary/10 border border-primary/15 -rotate-12" />
+              </div>
+              <p className="text-sm font-serif font-medium text-foreground mb-1">
+                {books.length === 0 ? "Your reading nook awaits" : "No books match your filters"}
+              </p>
+              <p className="text-xs text-muted-foreground max-w-[240px]">
+                {books.length === 0
+                  ? "Add your first book and start building your personal library."
+                  : "Try adjusting your search or filter to find what you're looking for."}
+              </p>
+            </div>
+          ) : (
+            <div className="grid gap-5 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
+              {filtered.map((book) => (
+                <BookCard key={book.id} book={book} onClick={handleBookClick} />
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       <AddBookDialog open={addOpen} onOpenChange={setAddOpen} onAdd={handleAdd} />
