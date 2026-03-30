@@ -48,22 +48,22 @@ export function StatsBar({ books }: StatsBarProps) {
   };
 
   return (
-    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between rounded-lg border bg-card p-4 sm:p-5">
+    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between rounded-xl bg-secondary/50 border border-border/40 p-4 sm:p-5">
       <div className="flex items-center gap-6 text-sm">
         <div className="flex items-center gap-2 text-status-reading">
           <BookOpen className="h-4 w-4" />
-          <span className="font-medium">{reading}</span>
-          <span className="text-muted-foreground">reading</span>
+          <span className="font-semibold">{reading}</span>
+          <span className="text-muted-foreground text-xs">reading</span>
         </div>
         <div className="flex items-center gap-2 text-status-finished">
           <CheckCircle2 className="h-4 w-4" />
-          <span className="font-medium">{booksRead}</span>
-          <span className="text-muted-foreground">this year</span>
+          <span className="font-semibold">{booksRead}</span>
+          <span className="text-muted-foreground text-xs">this year</span>
         </div>
-        <div className="flex items-center gap-2 text-status-to-read">
+        <div className="flex items-center gap-2 text-accent">
           <Clock className="h-4 w-4" />
-          <span className="font-medium">{toRead}</span>
-          <span className="text-muted-foreground">queued</span>
+          <span className="font-semibold">{toRead}</span>
+          <span className="text-muted-foreground text-xs">queued</span>
         </div>
       </div>
       <div className="flex items-center gap-2 min-w-0 sm:w-56">
@@ -78,7 +78,7 @@ export function StatsBar({ books }: StatsBarProps) {
               onChange={(e) => setDraft(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && commitGoal()}
               autoFocus
-              className="h-6 w-12 text-xs px-1 text-center"
+              className="h-6 w-12 text-xs px-1 text-center rounded-md"
             />
             <button onClick={commitGoal} className="text-primary hover:text-primary/80 transition-colors">
               <Check className="h-3.5 w-3.5" />
