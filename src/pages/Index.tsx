@@ -1,5 +1,6 @@
 import { useState, useCallback } from "react";
 import { Plus, Library, Search, ArrowUpDown, BookOpen, Armchair } from "lucide-react";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
