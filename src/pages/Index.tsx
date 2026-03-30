@@ -92,9 +92,12 @@ export default function Index() {
               </div>
               <h1 className="font-serif text-2xl font-bold tracking-tight text-foreground">Library</h1>
             </div>
-            <Button size="sm" className="rounded-lg shadow-sm" onClick={() => setAddOpen(true)}>
-              <Plus className="h-4 w-4 mr-1.5" /> Add book
-            </Button>
+            <div className="flex items-center gap-1.5">
+              <ThemeToggle />
+              <Button size="sm" className="rounded-lg shadow-sm" onClick={() => setAddOpen(true)}>
+                <Plus className="h-4 w-4 mr-1.5" /> Add book
+              </Button>
+            </div>
           </div>
 
           {/* Stats */}
