@@ -11,6 +11,7 @@ export interface Book {
   finishedAt?: string;
   currentPage?: number;
   totalPages?: number;
+  coverUrl?: string;
 }
 
 const STORAGE_KEY = "book-tracker-library";
