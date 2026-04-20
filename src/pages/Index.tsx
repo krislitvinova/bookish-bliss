@@ -214,6 +214,13 @@ export default function Index() {
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
+                    onClick={() => setSelectionMode(true)}
+                    disabled={books.length === 0}
+                  >
+                    <CheckSquare className="h-4 w-4 mr-2" /> Select books
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
                     onClick={() => setClearOpen(true)}
                     disabled={books.length === 0}
                     className="text-destructive focus:text-destructive"
