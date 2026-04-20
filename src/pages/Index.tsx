@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef } from "react";
-import { Plus, Library, Search, ArrowUpDown, BookOpen, Armchair, Download, Upload, MoreHorizontal, Trash2 } from "lucide-react";
+import { Plus, Library, Search, ArrowUpDown, BookOpen, Armchair, Download, Upload, MoreHorizontal, Trash2, CheckSquare, X } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -56,6 +56,32 @@ export default function Index() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [pendingFile, setPendingFile] = useState<File | null>(null);
   const [clearOpen, setClearOpen] = useState(false);
+  const [selectionMode, setSelectionMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
+
+  const exitSelection = () => {
+    setSelectionMode(false);
+    setSelectedIds(new Set());
+  };
+
+  const toggleSelect = (book: Book) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(book.id)) next.delete(book.id);
+      else next.add(book.id);
+      return next;
+    });
+  };
+
+  const handleBulkDelete = () => {
+    selectedIds.forEach((id) => deleteBook(id));
+    const count = selectedIds.size;
+    refresh();
+    exitSelection();
+    setBulkDeleteOpen(false);
+    toast({ title: `${count} book${count === 1 ? "" : "s"} deleted` });
+  };
 
   const handleClearLibrary = () => {
     localStorage.removeItem("book-tracker-library");
@@ -188,6 +214,13 @@ export default function Index() {
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
+                    onClick={() => setSelectionMode(true)}
+                    disabled={books.length === 0}
+                  >
+                    <CheckSquare className="h-4 w-4 mr-2" /> Select books
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
                     onClick={() => setClearOpen(true)}
                     disabled={books.length === 0}
                     className="text-destructive focus:text-destructive"
@@ -279,12 +312,63 @@ export default function Index() {
           ) : (
             <div className="grid gap-5 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
               {filtered.map((book) => (
-                <BookCard key={book.id} book={book} onClick={handleBookClick} />
+                <BookCard
+                  key={book.id}
+                  book={book}
+                  onClick={handleBookClick}
+                  selectionMode={selectionMode}
+                  selected={selectedIds.has(book.id)}
+                  onToggleSelect={toggleSelect}
+                />
               ))}
             </div>
           )}
         </div>
       </div>
+
+      {/* Bulk selection toolbar */}
+      {selectionMode && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 animate-in fade-in slide-in-from-bottom-4 duration-200">
+          <div className="flex items-center gap-2 bg-card border border-border/60 shadow-lg shadow-foreground/10 rounded-full px-3 py-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="rounded-full h-8 w-8 p-0"
+              onClick={exitSelection}
+              aria-label="Exit selection"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+            <span className="text-xs font-medium text-foreground px-1 min-w-[80px]">
+              {selectedIds.size} selected
+            </span>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="rounded-full h-8 text-xs"
+              onClick={() => {
+                if (selectedIds.size === filtered.length) {
+                  setSelectedIds(new Set());
+                } else {
+                  setSelectedIds(new Set(filtered.map((b) => b.id)));
+                }
+              }}
+            >
+              {selectedIds.size === filtered.length ? "Clear" : "Select all"}
+            </Button>
+            <Button
+              variant="destructive"
+              size="sm"
+              className="rounded-full h-8 text-xs"
+              disabled={selectedIds.size === 0}
+              onClick={() => setBulkDeleteOpen(true)}
+            >
+              <Trash2 className="h-3.5 w-3.5 mr-1.5" />
+              Delete
+            </Button>
+          </div>
+        </div>
+      )}
 
       <AddBookDialog open={addOpen} onOpenChange={setAddOpen} onAdd={handleAdd} />
       <BookDetailDialog
@@ -333,6 +417,28 @@ export default function Index() {
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               Clear library
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={bulkDeleteOpen} onOpenChange={setBulkDeleteOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              Delete {selectedIds.size} book{selectedIds.size === 1 ? "" : "s"}?
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              The selected book{selectedIds.size === 1 ? "" : "s"} will be permanently removed from your library. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleBulkDelete}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
