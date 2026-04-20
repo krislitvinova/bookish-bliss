@@ -265,6 +265,29 @@ export default function Index() {
         onUpdate={handleUpdate}
         onDelete={handleDelete}
       />
+
+      <AlertDialog open={!!pendingFile} onOpenChange={(o) => !o && setPendingFile(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Import library</AlertDialogTitle>
+            <AlertDialogDescription>
+              You already have {books.length} book{books.length === 1 ? "" : "s"}. Merge will add new books and skip duplicates. Replace will overwrite your library and cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="gap-2 sm:gap-2">
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <Button
+              variant="outline"
+              onClick={() => pendingFile && runImport(pendingFile, "replace")}
+            >
+              Replace
+            </Button>
+            <AlertDialogAction onClick={() => pendingFile && runImport(pendingFile, "merge")}>
+              Merge
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
