@@ -312,12 +312,63 @@ export default function Index() {
           ) : (
             <div className="grid gap-5 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
               {filtered.map((book) => (
-                <BookCard key={book.id} book={book} onClick={handleBookClick} />
+                <BookCard
+                  key={book.id}
+                  book={book}
+                  onClick={handleBookClick}
+                  selectionMode={selectionMode}
+                  selected={selectedIds.has(book.id)}
+                  onToggleSelect={toggleSelect}
+                />
               ))}
             </div>
           )}
         </div>
       </div>
+
+      {/* Bulk selection toolbar */}
+      {selectionMode && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 animate-in fade-in slide-in-from-bottom-4 duration-200">
+          <div className="flex items-center gap-2 bg-card border border-border/60 shadow-lg shadow-foreground/10 rounded-full px-3 py-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="rounded-full h-8 w-8 p-0"
+              onClick={exitSelection}
+              aria-label="Exit selection"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+            <span className="text-xs font-medium text-foreground px-1 min-w-[80px]">
+              {selectedIds.size} selected
+            </span>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="rounded-full h-8 text-xs"
+              onClick={() => {
+                if (selectedIds.size === filtered.length) {
+                  setSelectedIds(new Set());
+                } else {
+                  setSelectedIds(new Set(filtered.map((b) => b.id)));
+                }
+              }}
+            >
+              {selectedIds.size === filtered.length ? "Clear" : "Select all"}
+            </Button>
+            <Button
+              variant="destructive"
+              size="sm"
+              className="rounded-full h-8 text-xs"
+              disabled={selectedIds.size === 0}
+              onClick={() => setBulkDeleteOpen(true)}
+            >
+              <Trash2 className="h-3.5 w-3.5 mr-1.5" />
+              Delete
+            </Button>
+          </div>
+        </div>
+      )}
 
       <AddBookDialog open={addOpen} onOpenChange={setAddOpen} onAdd={handleAdd} />
       <BookDetailDialog
