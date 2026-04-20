@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef } from "react";
-import { Plus, Library, Search, ArrowUpDown, BookOpen, Armchair, Download, Upload, MoreHorizontal } from "lucide-react";
+import { Plus, Library, Search, ArrowUpDown, BookOpen, Armchair, Download, Upload, MoreHorizontal, Trash2 } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -55,6 +55,14 @@ export default function Index() {
   const [sort, setSort] = useState<SortOption>("date");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [pendingFile, setPendingFile] = useState<File | null>(null);
+  const [clearOpen, setClearOpen] = useState(false);
+
+  const handleClearLibrary = () => {
+    localStorage.removeItem("book-tracker-library");
+    refresh();
+    setClearOpen(false);
+    toast({ title: "Library cleared", description: "All books have been removed." });
+  };
 
   const refresh = useCallback(() => setBooks(getBooks()), []);
 
@@ -178,6 +186,14 @@ export default function Index() {
                   <DropdownMenuItem onClick={() => fileInputRef.current?.click()}>
                     <Upload className="h-4 w-4 mr-2" /> Import library
                   </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={() => setClearOpen(true)}
+                    disabled={books.length === 0}
+                    className="text-destructive focus:text-destructive"
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" /> Clear library
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
               <Button size="sm" className="rounded-lg shadow-sm" onClick={() => setAddOpen(true)}>
@@ -297,6 +313,26 @@ export default function Index() {
             </Button>
             <AlertDialogAction onClick={() => pendingFile && runImport(pendingFile, "merge")}>
               Merge
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={clearOpen} onOpenChange={setClearOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Clear your entire library?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently remove all {books.length} book{books.length === 1 ? "" : "s"} from your library. This action cannot be undone. Consider exporting a backup first.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleClearLibrary}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Clear library
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
