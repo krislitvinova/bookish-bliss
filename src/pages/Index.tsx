@@ -1,8 +1,27 @@
-import { useState, useCallback } from "react";
-import { Plus, Library, Search, ArrowUpDown, BookOpen, Armchair } from "lucide-react";
+import { useState, useCallback, useRef } from "react";
+import { Plus, Library, Search, ArrowUpDown, BookOpen, Armchair, Download, Upload, MoreHorizontal } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { exportLibrary, importLibraryFromFile, ImportMode } from "@/lib/libraryIO";
+import { toast } from "@/hooks/use-toast";
 import {
   Select,
   SelectContent,
@@ -34,8 +53,47 @@ export default function Index() {
   const [filter, setFilter] = useState<FilterStatus>("all");
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState<SortOption>("date");
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [pendingFile, setPendingFile] = useState<File | null>(null);
 
   const refresh = useCallback(() => setBooks(getBooks()), []);
+
+  const handleExport = () => {
+    try {
+      exportLibrary();
+      toast({ title: "Library exported", description: "Your backup file has been downloaded." });
+    } catch {
+      toast({ title: "Export failed", variant: "destructive" });
+    }
+  };
+
+  const runImport = async (file: File, mode: ImportMode) => {
+    try {
+      const result = await importLibraryFromFile(file, mode);
+      refresh();
+      toast({
+        title: mode === "replace" ? "Library replaced" : "Import complete",
+        description: `${result.imported} book${result.imported === 1 ? "" : "s"} imported${
+          result.skipped > 0 ? `, ${result.skipped} skipped` : ""
+        }.`,
+      });
+    } catch {
+      toast({ title: "Import failed", description: "Invalid backup file.", variant: "destructive" });
+    } finally {
+      setPendingFile(null);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
+  const handleFileSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (books.length === 0) {
+      runImport(file, "merge");
+    } else {
+      setPendingFile(file);
+    }
+  };
 
   const handleAdd = (data: Omit<Book, "id" | "createdAt">) => {
     addBook(data);
