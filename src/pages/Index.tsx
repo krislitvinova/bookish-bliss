@@ -317,6 +317,26 @@ export default function Index() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <AlertDialog open={clearOpen} onOpenChange={setClearOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Clear your entire library?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently remove all {books.length} book{books.length === 1 ? "" : "s"} from your library. This action cannot be undone. Consider exporting a backup first.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleClearLibrary}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Clear library
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
