@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef } from "react";
-import { Plus, Library, Search, ArrowUpDown, BookOpen, Armchair, Download, Upload, MoreHorizontal } from "lucide-react";
+import { Plus, Library, Search, ArrowUpDown, BookOpen, Armchair, Download, Upload, MoreHorizontal, Trash2 } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
