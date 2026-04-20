@@ -20,7 +20,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { exportLibrary, importLibraryFromFile, ImportMode } from "@/lib/libraryIO";
+import { exportLibrary, exportLibraryCSV, importLibraryFromFile, ImportMode } from "@/lib/libraryIO";
 import { toast } from "@/hooks/use-toast";
 import {
   Select,
@@ -158,10 +158,23 @@ export default function Index() {
                     <MoreHorizontal className="h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuContent align="end" className="w-52">
                   <DropdownMenuItem onClick={handleExport}>
-                    <Download className="h-4 w-4 mr-2" /> Export library
+                    <Download className="h-4 w-4 mr-2" /> Export as JSON
                   </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => {
+                      try {
+                        exportLibraryCSV();
+                        toast({ title: "CSV exported", description: "Open it in Excel or Google Sheets." });
+                      } catch {
+                        toast({ title: "Export failed", variant: "destructive" });
+                      }
+                    }}
+                  >
+                    <Download className="h-4 w-4 mr-2" /> Export as CSV
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={() => fileInputRef.current?.click()}>
                     <Upload className="h-4 w-4 mr-2" /> Import library
                   </DropdownMenuItem>

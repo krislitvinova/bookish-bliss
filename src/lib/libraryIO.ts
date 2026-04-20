@@ -1,5 +1,20 @@
 import { Book, getBooks, saveBooks } from "./books";
 
+function downloadBlob(blob: Blob, filename: string) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function dateStamp() {
+  return new Date().toISOString().slice(0, 10);
+}
+
 export function exportLibrary() {
   const books = getBooks();
   const payload = {
@@ -10,15 +25,28 @@ export function exportLibrary() {
   const blob = new Blob([JSON.stringify(payload, null, 2)], {
     type: "application/json",
   });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  const date = new Date().toISOString().slice(0, 10);
-  a.href = url;
-  a.download = `library-backup-${date}.json`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+  downloadBlob(blob, `library-backup-${dateStamp()}.json`);
+}
+
+function csvEscape(value: unknown): string {
+  if (value === null || value === undefined) return "";
+  const s = String(value);
+  if (/[",\n\r]/.test(s)) return `"${s.replace(/"/g, '""')}"`;
+  return s;
+}
+
+export function exportLibraryCSV() {
+  const books = getBooks();
+  const headers = [
+    "id", "title", "author", "status", "rating", "notes",
+    "createdAt", "finishedAt", "currentPage", "totalPages", "coverUrl",
+  ];
+  const rows = books.map((b) =>
+    headers.map((h) => csvEscape((b as unknown as Record<string, unknown>)[h])).join(",")
+  );
+  const csv = "\uFEFF" + headers.join(",") + "\n" + rows.join("\n");
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+  downloadBlob(blob, `library-${dateStamp()}.csv`);
 }
 
 export type ImportMode = "merge" | "replace";
