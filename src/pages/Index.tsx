@@ -152,9 +152,31 @@ export default function Index() {
             </div>
             <div className="flex items-center gap-1.5">
               <ThemeToggle />
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button size="sm" variant="ghost" className="rounded-lg h-9 w-9 p-0" aria-label="Library options">
+                    <MoreHorizontal className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem onClick={handleExport}>
+                    <Download className="h-4 w-4 mr-2" /> Export library
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => fileInputRef.current?.click()}>
+                    <Upload className="h-4 w-4 mr-2" /> Import library
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
               <Button size="sm" className="rounded-lg shadow-sm" onClick={() => setAddOpen(true)}>
                 <Plus className="h-4 w-4 mr-1.5" /> Add book
               </Button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="application/json,.json"
+                className="hidden"
+                onChange={handleFileSelected}
+              />
             </div>
           </div>
 
