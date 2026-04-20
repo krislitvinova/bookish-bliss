@@ -55,6 +55,14 @@ export default function Index() {
   const [sort, setSort] = useState<SortOption>("date");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [pendingFile, setPendingFile] = useState<File | null>(null);
+  const [clearOpen, setClearOpen] = useState(false);
+
+  const handleClearLibrary = () => {
+    localStorage.removeItem("book-tracker-library");
+    refresh();
+    setClearOpen(false);
+    toast({ title: "Library cleared", description: "All books have been removed." });
+  };
 
   const refresh = useCallback(() => setBooks(getBooks()), []);
 
