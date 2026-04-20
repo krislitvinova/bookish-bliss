@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef } from "react";
-import { Plus, Library, Search, ArrowUpDown, BookOpen, Armchair, Download, Upload, MoreHorizontal, Trash2 } from "lucide-react";
+import { Plus, Library, Search, ArrowUpDown, BookOpen, Armchair, Download, Upload, MoreHorizontal, Trash2, CheckSquare, X } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -56,6 +56,32 @@ export default function Index() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [pendingFile, setPendingFile] = useState<File | null>(null);
   const [clearOpen, setClearOpen] = useState(false);
+  const [selectionMode, setSelectionMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
+
+  const exitSelection = () => {
+    setSelectionMode(false);
+    setSelectedIds(new Set());
+  };
+
+  const toggleSelect = (book: Book) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(book.id)) next.delete(book.id);
+      else next.add(book.id);
+      return next;
+    });
+  };
+
+  const handleBulkDelete = () => {
+    selectedIds.forEach((id) => deleteBook(id));
+    const count = selectedIds.size;
+    refresh();
+    exitSelection();
+    setBulkDeleteOpen(false);
+    toast({ title: `${count} book${count === 1 ? "" : "s"} deleted` });
+  };
 
   const handleClearLibrary = () => {
     localStorage.removeItem("book-tracker-library");
