@@ -61,29 +61,7 @@ export function BookCard({
           <BookOpen className="h-10 w-10 text-muted-foreground/30" strokeWidth={1.5} />
         )}
 
-        {/* Cover source indicator */}
-        {book.coverUrl && !selectionMode && (() => {
-          const info = getCoverSourceInfo(book.coverUrl);
-          if (info.source === "none") return null;
-          return (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <span
-                  className={cn(
-                    "absolute bottom-2 left-2 z-10 text-[9px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded shadow-sm backdrop-blur-sm",
-                    info.className
-                  )}
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  {info.shortLabel}
-                </span>
-              </TooltipTrigger>
-              <TooltipContent side="top" className="text-xs">
-                {info.label}
-              </TooltipContent>
-            </Tooltip>
-          );
-        })()}
+        {/* (cover source indicator moved into the info area to avoid overlapping checkbox, status, or progress) */}
 
         {/* Selection checkbox */}
         {selectionMode && (
@@ -121,8 +99,33 @@ export function BookCard({
         <p className="text-xs text-muted-foreground truncate">
           {book.author}
         </p>
-        <div className="mt-auto pt-1 min-h-[18px]">
-          {book.rating > 0 && <StarRating rating={book.rating} />}
+        <div className="mt-auto pt-1 min-h-[18px] flex items-center justify-between gap-2">
+          <div className="min-w-0">
+            {book.rating > 0 && <StarRating rating={book.rating} />}
+          </div>
+          {book.coverUrl && (() => {
+            const info = getCoverSourceInfo(book.coverUrl);
+            if (info.source === "none") return null;
+            return (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span
+                    className={cn(
+                      "shrink-0 text-[9px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded",
+                      info.className
+                    )}
+                    onClick={(e) => e.stopPropagation()}
+                    aria-label={info.label}
+                  >
+                    {info.shortLabel}
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent side="top" className="text-xs">
+                  {info.label}
+                </TooltipContent>
+              </Tooltip>
+            );
+          })()}
         </div>
       </div>
     </button>
