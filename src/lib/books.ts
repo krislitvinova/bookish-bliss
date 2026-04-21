@@ -84,8 +84,20 @@ function bookToInsert(b: Omit<Book, "id" | "createdAt">, userId: string) {
   };
 }
 
-function updatesToDb(u: Partial<Book>) {
-  const out: Record<string, unknown> = {};
+type DbUpdate = Partial<{
+  title: string;
+  author: string;
+  status: BookStatus;
+  rating: number;
+  notes: string;
+  finished_at: string | null;
+  current_page: number | null;
+  total_pages: number | null;
+  cover_url: string | null;
+}>;
+
+function updatesToDb(u: Partial<Book>): DbUpdate {
+  const out: DbUpdate = {};
   if (u.title !== undefined) out.title = u.title;
   if (u.author !== undefined) out.author = u.author;
   if (u.status !== undefined) out.status = u.status;

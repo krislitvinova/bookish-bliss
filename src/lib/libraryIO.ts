@@ -1,4 +1,4 @@
-import { Book, getBooks, saveBooks } from "./books";
+import { Book, getLocalBooks as getBooks, saveLocalBooks as saveBooks } from "./books";
 
 function downloadBlob(blob: Blob, filename: string) {
   const url = URL.createObjectURL(blob);
