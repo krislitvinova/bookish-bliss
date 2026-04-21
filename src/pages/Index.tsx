@@ -247,6 +247,49 @@ export default function Index() {
               <h1 className="font-serif text-2xl font-bold tracking-tight text-foreground">Library</h1>
             </div>
             <div className="flex items-center gap-1.5">
+              {userId ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="rounded-lg h-9 gap-1.5 px-2 text-xs"
+                      aria-label="Account"
+                    >
+                      <Cloud className="h-3.5 w-3.5 text-primary" />
+                      <span className="hidden sm:inline max-w-[140px] truncate">
+                        {user?.email}
+                      </span>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56">
+                    <DropdownMenuLabel className="font-normal">
+                      <div className="flex flex-col">
+                        <span className="text-xs font-medium">Synced to cloud</span>
+                        <span className="text-[11px] text-muted-foreground truncate">
+                          {user?.email}
+                        </span>
+                      </div>
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={signOut}>
+                      <LogOut className="h-4 w-4 mr-2" /> Odhlásit se
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <Button
+                  asChild
+                  size="sm"
+                  variant="ghost"
+                  className="rounded-lg h-9 gap-1.5 px-2 text-xs"
+                >
+                  <Link to="/auth" aria-label="Sign in">
+                    <CloudOff className="h-3.5 w-3.5 text-muted-foreground" />
+                    <span className="hidden sm:inline">Přihlásit</span>
+                  </Link>
+                </Button>
+              )}
               <ThemeToggle />
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -261,7 +304,7 @@ export default function Index() {
                   <DropdownMenuItem
                     onClick={() => {
                       try {
-                        exportLibraryCSV();
+                        exportLibraryCSV(books);
                         toast({ title: "CSV exported", description: "Open it in Excel or Google Sheets." });
                       } catch {
                         toast({ title: "Export failed", variant: "destructive" });
