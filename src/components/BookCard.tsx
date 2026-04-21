@@ -99,8 +99,33 @@ export function BookCard({
         <p className="text-xs text-muted-foreground truncate">
           {book.author}
         </p>
-        <div className="mt-auto pt-1 min-h-[18px]">
-          {book.rating > 0 && <StarRating rating={book.rating} />}
+        <div className="mt-auto pt-1 min-h-[18px] flex items-center justify-between gap-2">
+          <div className="min-w-0">
+            {book.rating > 0 && <StarRating rating={book.rating} />}
+          </div>
+          {book.coverUrl && (() => {
+            const info = getCoverSourceInfo(book.coverUrl);
+            if (info.source === "none") return null;
+            return (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span
+                    className={cn(
+                      "shrink-0 text-[9px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded",
+                      info.className
+                    )}
+                    onClick={(e) => e.stopPropagation()}
+                    aria-label={info.label}
+                  >
+                    {info.shortLabel}
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent side="top" className="text-xs">
+                  {info.label}
+                </TooltipContent>
+              </Tooltip>
+            );
+          })()}
         </div>
       </div>
     </button>
