@@ -1,4 +1,4 @@
-import { Book, getBooks, saveBooks } from "./books";
+import { Book, getLocalBooks as getBooks, saveLocalBooks as saveBooks } from "./books";
 
 function downloadBlob(blob: Blob, filename: string) {
   const url = URL.createObjectURL(blob);
@@ -15,8 +15,8 @@ function dateStamp() {
   return new Date().toISOString().slice(0, 10);
 }
 
-export function exportLibrary() {
-  const books = getBooks();
+export function exportLibrary(booksOverride?: Book[]) {
+  const books = booksOverride ?? getBooks();
   const payload = {
     version: 1,
     exportedAt: new Date().toISOString(),
@@ -35,8 +35,8 @@ function csvEscape(value: unknown): string {
   return s;
 }
 
-export function exportLibraryCSV() {
-  const books = getBooks();
+export function exportLibraryCSV(booksOverride?: Book[]) {
+  const books = booksOverride ?? getBooks();
   const headers = [
     "id", "title", "author", "status", "rating", "notes",
     "createdAt", "finishedAt", "currentPage", "totalPages", "coverUrl",

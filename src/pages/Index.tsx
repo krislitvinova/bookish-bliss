@@ -1,5 +1,6 @@
-import { useState, useCallback, useRef } from "react";
-import { Plus, Library, Search, ArrowUpDown, BookOpen, Armchair, Download, Upload, MoreHorizontal, Trash2, CheckSquare, X } from "lucide-react";
+import { useState, useCallback, useRef, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { Plus, Library, Search, ArrowUpDown, BookOpen, Armchair, Download, Upload, MoreHorizontal, Trash2, CheckSquare, X, Cloud, CloudOff, LogOut, User as UserIcon } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,6 +8,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
@@ -22,6 +24,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { exportLibrary, exportLibraryCSV, importLibraryFromFile, ImportMode } from "@/lib/libraryIO";
 import { toast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 import {
   Select,
   SelectContent,
@@ -36,17 +39,23 @@ import { BookDetailDialog } from "@/components/BookDetailDialog";
 import {
   Book,
   BookStatus,
-  getBooks,
-  addBook,
-  updateBook,
-  deleteBook,
+  fetchBooks,
+  addBook as apiAddBook,
+  updateBook as apiUpdateBook,
+  deleteBook as apiDeleteBook,
+  clearAllBooks,
+  uploadLocalBooksToCloud,
+  getLocalBooks,
 } from "@/lib/books";
 
 type FilterStatus = BookStatus | "all";
 type SortOption = "date" | "title" | "rating";
 
 export default function Index() {
-  const [books, setBooks] = useState<Book[]>(getBooks);
+  const { user, loading: authLoading, signOut } = useAuth();
+  const userId = user?.id ?? null;
+
+  const [books, setBooks] = useState<Book[]>(() => getLocalBooks());
   const [addOpen, setAddOpen] = useState(false);
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
   const [detailOpen, setDetailOpen] = useState(false);
@@ -59,6 +68,37 @@ export default function Index() {
   const [selectionMode, setSelectionMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
+
+  const refresh = useCallback(async () => {
+    try {
+      const list = await fetchBooks(userId);
+      setBooks(list);
+    } catch (e) {
+      toast({ title: "Načítání knih selhalo", description: (e as Error).message, variant: "destructive" });
+    }
+  }, [userId]);
+
+  useEffect(() => {
+    if (authLoading) return;
+    let cancelled = false;
+    (async () => {
+      if (userId) {
+        try {
+          const uploaded = await uploadLocalBooksToCloud(userId);
+          if (!cancelled && uploaded > 0) {
+            toast({
+              title: "Knihy nahrány do cloudu",
+              description: `${uploaded} kn${uploaded === 1 ? "iha" : uploaded < 5 ? "ihy" : "ih"} z prohlížeče byla synchronizována.`,
+            });
+          }
+        } catch (e) {
+          toast({ title: "Nahrání selhalo", description: (e as Error).message, variant: "destructive" });
+        }
+      }
+      if (!cancelled) await refresh();
+    })();
+    return () => { cancelled = true; };
+  }, [userId, authLoading, refresh]);
 
   const exitSelection = () => {
     setSelectionMode(false);
@@ -74,27 +114,34 @@ export default function Index() {
     });
   };
 
-  const handleBulkDelete = () => {
-    selectedIds.forEach((id) => deleteBook(id));
-    const count = selectedIds.size;
-    refresh();
+  const handleBulkDelete = async () => {
+    const ids = Array.from(selectedIds);
+    try {
+      await Promise.all(ids.map((id) => apiDeleteBook(userId, id)));
+    } catch (e) {
+      toast({ title: "Mazání selhalo", description: (e as Error).message, variant: "destructive" });
+    }
+    const count = ids.length;
+    await refresh();
     exitSelection();
     setBulkDeleteOpen(false);
     toast({ title: `${count} book${count === 1 ? "" : "s"} deleted` });
   };
 
-  const handleClearLibrary = () => {
-    localStorage.removeItem("book-tracker-library");
-    refresh();
-    setClearOpen(false);
-    toast({ title: "Library cleared", description: "All books have been removed." });
+  const handleClearLibrary = async () => {
+    try {
+      await clearAllBooks(userId);
+      await refresh();
+      setClearOpen(false);
+      toast({ title: "Library cleared", description: "All books have been removed." });
+    } catch (e) {
+      toast({ title: "Clear failed", description: (e as Error).message, variant: "destructive" });
+    }
   };
-
-  const refresh = useCallback(() => setBooks(getBooks()), []);
 
   const handleExport = () => {
     try {
-      exportLibrary();
+      exportLibrary(books);
       toast({ title: "Library exported", description: "Your backup file has been downloaded." });
     } catch {
       toast({ title: "Export failed", variant: "destructive" });
@@ -104,7 +151,10 @@ export default function Index() {
   const runImport = async (file: File, mode: ImportMode) => {
     try {
       const result = await importLibraryFromFile(file, mode);
-      refresh();
+      if (userId) {
+        await uploadLocalBooksToCloud(userId);
+      }
+      await refresh();
       toast({
         title: mode === "replace" ? "Library replaced" : "Import complete",
         description: `${result.imported} book${result.imported === 1 ? "" : "s"} imported${
@@ -129,19 +179,31 @@ export default function Index() {
     }
   };
 
-  const handleAdd = (data: Omit<Book, "id" | "createdAt">) => {
-    addBook(data);
-    refresh();
+  const handleAdd = async (data: Omit<Book, "id" | "createdAt">) => {
+    try {
+      await apiAddBook(userId, data);
+      await refresh();
+    } catch (e) {
+      toast({ title: "Přidání selhalo", description: (e as Error).message, variant: "destructive" });
+    }
   };
 
-  const handleUpdate = (id: string, updates: Partial<Book>) => {
-    updateBook(id, updates);
-    refresh();
+  const handleUpdate = async (id: string, updates: Partial<Book>) => {
+    try {
+      await apiUpdateBook(userId, id, updates);
+      await refresh();
+    } catch (e) {
+      toast({ title: "Uložení selhalo", description: (e as Error).message, variant: "destructive" });
+    }
   };
 
-  const handleDelete = (id: string) => {
-    deleteBook(id);
-    refresh();
+  const handleDelete = async (id: string) => {
+    try {
+      await apiDeleteBook(userId, id);
+      await refresh();
+    } catch (e) {
+      toast({ title: "Mazání selhalo", description: (e as Error).message, variant: "destructive" });
+    }
   };
 
   const handleBookClick = (book: Book) => {
@@ -185,6 +247,49 @@ export default function Index() {
               <h1 className="font-serif text-2xl font-bold tracking-tight text-foreground">Library</h1>
             </div>
             <div className="flex items-center gap-1.5">
+              {userId ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="rounded-lg h-9 gap-1.5 px-2 text-xs"
+                      aria-label="Account"
+                    >
+                      <Cloud className="h-3.5 w-3.5 text-primary" />
+                      <span className="hidden sm:inline max-w-[140px] truncate">
+                        {user?.email}
+                      </span>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56">
+                    <DropdownMenuLabel className="font-normal">
+                      <div className="flex flex-col">
+                        <span className="text-xs font-medium">Synced to cloud</span>
+                        <span className="text-[11px] text-muted-foreground truncate">
+                          {user?.email}
+                        </span>
+                      </div>
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={signOut}>
+                      <LogOut className="h-4 w-4 mr-2" /> Odhlásit se
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <Button
+                  asChild
+                  size="sm"
+                  variant="ghost"
+                  className="rounded-lg h-9 gap-1.5 px-2 text-xs"
+                >
+                  <Link to="/auth" aria-label="Sign in">
+                    <CloudOff className="h-3.5 w-3.5 text-muted-foreground" />
+                    <span className="hidden sm:inline">Přihlásit</span>
+                  </Link>
+                </Button>
+              )}
               <ThemeToggle />
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -199,7 +304,7 @@ export default function Index() {
                   <DropdownMenuItem
                     onClick={() => {
                       try {
-                        exportLibraryCSV();
+                        exportLibraryCSV(books);
                         toast({ title: "CSV exported", description: "Open it in Excel or Google Sheets." });
                       } catch {
                         toast({ title: "Export failed", variant: "destructive" });
