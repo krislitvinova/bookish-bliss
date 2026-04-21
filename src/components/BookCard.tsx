@@ -87,24 +87,17 @@ export function BookCard({
         )}
       </div>
 
-      {/* Info area */}
-      <div className="p-3.5">
-        <h3 className="font-serif font-semibold text-sm leading-snug text-card-foreground line-clamp-2">
+      {/* Info area — fixed layout for visual uniformity */}
+      <div className="p-3.5 flex flex-col gap-1 flex-1 min-h-[96px]">
+        <h3 className="font-serif font-semibold text-sm leading-snug text-card-foreground line-clamp-2 min-h-[2.5rem]">
           {book.title}
         </h3>
-        <p className="text-xs text-muted-foreground mt-1 truncate">
+        <p className="text-xs text-muted-foreground truncate">
           {book.author}
         </p>
-        {book.rating > 0 && (
-          <div className="mt-2">
-            <StarRating rating={book.rating} />
-          </div>
-        )}
-        {book.notes && (
-          <p className="mt-2 text-[11px] text-muted-foreground/80 line-clamp-2 leading-relaxed">
-            {book.notes}
-          </p>
-        )}
+        <div className="mt-auto pt-1 min-h-[18px]">
+          {book.rating > 0 && <StarRating rating={book.rating} />}
+        </div>
       </div>
     </button>
   );
