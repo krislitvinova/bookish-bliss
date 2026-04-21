@@ -40,18 +40,18 @@ export function BookCard({
       onClick={handleClick}
       aria-pressed={selectionMode ? selected : undefined}
       className={cn(
-        "group relative w-full text-left rounded-xl bg-card overflow-hidden shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+        "group relative w-full text-left rounded-xl bg-card overflow-hidden shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 flex flex-col h-full",
         selected && "ring-2 ring-primary ring-offset-2"
       )}
     >
       {/* Cover */}
-      <div className={`relative aspect-[2/3] w-full ${book.coverUrl ? '' : `bg-gradient-to-br ${COVER_GRADIENTS[book.status] ?? COVER_GRADIENTS.reading}`} flex items-center justify-center overflow-hidden`}>
+      <div className={`relative aspect-[2/3] w-full shrink-0 ${book.coverUrl ? 'bg-secondary' : `bg-gradient-to-br ${COVER_GRADIENTS[book.status] ?? COVER_GRADIENTS.reading}`} flex items-center justify-center overflow-hidden`}>
         {book.coverUrl ? (
           <img
             src={book.coverUrl}
             alt={`Cover of ${book.title}`}
             className={cn(
-              "w-full h-full object-cover transition-transform duration-300 group-hover:scale-105",
+              "absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105",
               selected && "opacity-80"
             )}
           />
@@ -87,24 +87,17 @@ export function BookCard({
         )}
       </div>
 
-      {/* Info area */}
-      <div className="p-3.5">
-        <h3 className="font-serif font-semibold text-sm leading-snug text-card-foreground line-clamp-2">
+      {/* Info area — fixed layout for visual uniformity */}
+      <div className="p-3.5 flex flex-col gap-1 flex-1 min-h-[96px]">
+        <h3 className="font-serif font-semibold text-sm leading-snug text-card-foreground line-clamp-2 min-h-[2.5rem]">
           {book.title}
         </h3>
-        <p className="text-xs text-muted-foreground mt-1 truncate">
+        <p className="text-xs text-muted-foreground truncate">
           {book.author}
         </p>
-        {book.rating > 0 && (
-          <div className="mt-2">
-            <StarRating rating={book.rating} />
-          </div>
-        )}
-        {book.notes && (
-          <p className="mt-2 text-[11px] text-muted-foreground/80 line-clamp-2 leading-relaxed">
-            {book.notes}
-          </p>
-        )}
+        <div className="mt-auto pt-1 min-h-[18px]">
+          {book.rating > 0 && <StarRating rating={book.rating} />}
+        </div>
       </div>
     </button>
   );
