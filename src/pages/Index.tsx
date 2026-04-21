@@ -74,6 +74,15 @@ export default function Index() {
       const list = await fetchBooks(userId);
       setBooks(list);
     } catch (e) {
+      const localBooks = getLocalBooks();
+      if (userId && localBooks.length > 0) {
+        setBooks(localBooks);
+        toast({
+          title: "Knihy obnoveny z tohoto prohlížeče",
+          description: "Cloud se teď nepodařilo načíst, proto dočasně ukazuju lokální kopii.",
+        });
+        return;
+      }
       toast({ title: "Načítání knih selhalo", description: (e as Error).message, variant: "destructive" });
     }
   }, [userId]);
@@ -83,6 +92,7 @@ export default function Index() {
     let cancelled = false;
     (async () => {
       if (userId) {
+        const localBooks = getLocalBooks();
         try {
           const uploaded = await uploadLocalBooksToCloud(userId);
           if (!cancelled && uploaded > 0) {
@@ -92,7 +102,11 @@ export default function Index() {
             });
           }
         } catch (e) {
+          if (!cancelled && localBooks.length > 0) {
+            setBooks(localBooks);
+          }
           toast({ title: "Nahrání selhalo", description: (e as Error).message, variant: "destructive" });
+          return;
         }
       }
       if (!cancelled) await refresh();
