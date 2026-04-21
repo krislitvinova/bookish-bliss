@@ -5,6 +5,8 @@ import { Progress } from "@/components/ui/progress";
 import { Checkbox } from "@/components/ui/checkbox";
 import { BookOpen } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { getCoverSourceInfo } from "@/lib/coverSource";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface BookCardProps {
   book: Book;
@@ -58,6 +60,30 @@ export function BookCard({
         ) : (
           <BookOpen className="h-10 w-10 text-muted-foreground/30" strokeWidth={1.5} />
         )}
+
+        {/* Cover source indicator */}
+        {book.coverUrl && !selectionMode && (() => {
+          const info = getCoverSourceInfo(book.coverUrl);
+          if (info.source === "none") return null;
+          return (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span
+                  className={cn(
+                    "absolute bottom-2 left-2 z-10 text-[9px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded shadow-sm backdrop-blur-sm",
+                    info.className
+                  )}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {info.shortLabel}
+                </span>
+              </TooltipTrigger>
+              <TooltipContent side="top" className="text-xs">
+                {info.label}
+              </TooltipContent>
+            </Tooltip>
+          );
+        })()}
 
         {/* Selection checkbox */}
         {selectionMode && (
