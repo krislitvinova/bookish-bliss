@@ -40,18 +40,18 @@ export function BookCard({
       onClick={handleClick}
       aria-pressed={selectionMode ? selected : undefined}
       className={cn(
-        "group relative w-full text-left rounded-xl bg-card overflow-hidden shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+        "group relative w-full text-left rounded-xl bg-card overflow-hidden shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 flex flex-col h-full",
         selected && "ring-2 ring-primary ring-offset-2"
       )}
     >
       {/* Cover */}
-      <div className={`relative aspect-[2/3] w-full ${book.coverUrl ? '' : `bg-gradient-to-br ${COVER_GRADIENTS[book.status] ?? COVER_GRADIENTS.reading}`} flex items-center justify-center overflow-hidden`}>
+      <div className={`relative aspect-[2/3] w-full shrink-0 ${book.coverUrl ? 'bg-secondary' : `bg-gradient-to-br ${COVER_GRADIENTS[book.status] ?? COVER_GRADIENTS.reading}`} flex items-center justify-center overflow-hidden`}>
         {book.coverUrl ? (
           <img
             src={book.coverUrl}
             alt={`Cover of ${book.title}`}
             className={cn(
-              "w-full h-full object-cover transition-transform duration-300 group-hover:scale-105",
+              "absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105",
               selected && "opacity-80"
             )}
           />
